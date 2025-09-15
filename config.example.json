@@ -1,0 +1,15 @@
+{
+  "targets": [
+    "8.8.8.8",
+    "1.1.1.1",
+    "114.114.114.114"
+  ],
+  "latency_threshold": 100.0,
+  "check_interval": 10,
+  "timeout": 5,
+  "dingtalk_webhook": "https://oapi.dingtalk.com/robot/send?access_token=YOUR_DINGTALK_TOKEN_HERE",
+  "dingtalk_enabled": true,
+  "notification_interval": 300,
+  "client_name": "Network Monitor Client",
+  "log_file": "network_monitor.log"
+}

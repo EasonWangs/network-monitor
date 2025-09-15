@@ -45,7 +45,16 @@ Download the latest release from the [Releases](https://github.com/EasonWangs/ne
 
 ## Configuration
 
-Edit `config.json` to customize monitoring settings:
+### Quick Setup for Downloaded Executables
+
+1. **Download** the executable for your platform
+2. **Run** the executable once - it will create a default `config.json` file
+3. **Edit** `config.json` to configure DingTalk webhook (optional)
+4. **Run** again to start monitoring
+
+### Configuration File
+
+The program automatically creates `config.json` on first run:
 
 ```json
 {
@@ -64,6 +73,8 @@ Edit `config.json` to customize monitoring settings:
   "log_file": "network_monitor.log"
 }
 ```
+
+📖 **Detailed configuration guide**: See [CONFIGURATION.md](CONFIGURATION.md)
 
 ### Configuration Options
 
