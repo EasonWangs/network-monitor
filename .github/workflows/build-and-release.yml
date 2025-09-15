@@ -25,9 +25,10 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Test DingTalk notification
+    - name: Test DingTalk notification (optional)
       run: |
-        python source/test_dingtalk.py || echo "DingTalk test may fail without webhook URL"
+        echo "Testing DingTalk integration..."
+        python source/test_dingtalk.py || echo "DingTalk test skipped - webhook not configured"
 
   build-linux:
     needs: test

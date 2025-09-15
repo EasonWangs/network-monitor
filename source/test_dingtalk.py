@@ -10,8 +10,22 @@ from datetime import datetime
 
 def test_dingtalk_webhook():
     """测试钉钉Webhook通知"""
-    # 钉钉Webhook地址
-    webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=abb6aeb35b9f027375bc48a9afc893b88a0b4cae9e742d0db4541125b284e361"
+    # 从配置文件读取钉钉Webhook地址
+    try:
+        with open('config.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        webhook_url = config.get('dingtalk_webhook', '')
+
+        if not webhook_url or webhook_url == "YOUR_DINGTALK_WEBHOOK_URL_HERE":
+            print("⚠️ 钉钉Webhook未配置，跳过测试")
+            print("请在 config.json 中设置正确的 dingtalk_webhook 地址")
+            return
+    except FileNotFoundError:
+        print("❌ 配置文件 config.json 不存在")
+        return
+    except json.JSONDecodeError:
+        print("❌ 配置文件格式错误")
+        return
     
     # 测试消息
     client_name = "测试客户端"
