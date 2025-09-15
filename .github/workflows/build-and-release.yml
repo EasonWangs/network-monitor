@@ -112,6 +112,41 @@ jobs:
         pyinstaller --onefile source/network_monitor.py --name NetworkMonitor-CLI-macOS
         pyinstaller --onefile --windowed source/network_monitor_gui.py --name NetworkMonitor-GUI-macOS
 
+    - name: Make macOS executables executable and create app bundle
+      run: |
+        chmod +x dist/NetworkMonitor-CLI-macOS
+        chmod +x dist/NetworkMonitor-GUI-macOS
+
+        # Create app bundle for GUI version
+        mkdir -p dist/NetworkMonitor.app/Contents/MacOS
+        mkdir -p dist/NetworkMonitor.app/Contents/Resources
+
+        # Copy executable
+        cp dist/NetworkMonitor-GUI-macOS dist/NetworkMonitor.app/Contents/MacOS/NetworkMonitor
+        chmod +x dist/NetworkMonitor.app/Contents/MacOS/NetworkMonitor
+
+        # Create Info.plist
+        cat > dist/NetworkMonitor.app/Contents/Info.plist << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleExecutable</key>
+            <string>NetworkMonitor</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.easonwangs.networkmonitor</string>
+            <key>CFBundleName</key>
+            <string>Network Monitor</string>
+            <key>CFBundleVersion</key>
+            <string>1.0</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>LSUIElement</key>
+            <true/>
+        </dict>
+        </plist>
+        EOF
+
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -119,6 +154,7 @@ jobs:
         path: |
           dist/NetworkMonitor-CLI-macOS
           dist/NetworkMonitor-GUI-macOS
+          dist/NetworkMonitor.app
 
   release:
     needs: [build-linux, build-windows, build-macos]
@@ -149,6 +185,7 @@ jobs:
           **/NetworkMonitor-GUI-Windows.exe
           **/NetworkMonitor-CLI-macOS
           **/NetworkMonitor-GUI-macOS
+          **/NetworkMonitor.app
         generate_release_notes: true
         draft: false
         prerelease: false

@@ -18,7 +18,7 @@ A cross-platform network monitoring tool with both GUI and command-line interfac
 Download the latest release from the [Releases](https://github.com/EasonWangs/network-monitor/releases) page:
 
 - **Windows**: `NetworkMonitor-GUI-Windows.exe` or `NetworkMonitor-CLI-Windows.exe`
-- **macOS**: `NetworkMonitor-GUI-macOS` or `NetworkMonitor-CLI-macOS`
+- **macOS**: `NetworkMonitor.app` (double-click to run) or executable files (see [macOS Setup Guide](MACOS_SETUP.md))
 - **Linux**: `NetworkMonitor-GUI-Linux` or `NetworkMonitor-CLI-Linux`
 
 ### Run from Source
@@ -97,6 +97,8 @@ The GUI version provides:
 - Visual network status indicators
 - Easy configuration management
 - System tray integration
+
+**macOS users**: See [macOS Setup Guide](MACOS_SETUP.md) for installation and security configuration.
 
 ### Command Line Version
 
