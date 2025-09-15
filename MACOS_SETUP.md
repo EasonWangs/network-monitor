@@ -2,19 +2,33 @@
 
 ## 🍎 macOS 专用说明
 
-由于 macOS 的安全机制，运行网络监控工具需要一些额外步骤。
+网络监控工具为 macOS 提供了标准的 .dmg 安装包，符合 Mac 用户的使用习惯。
 
 ## 📦 下载文件
 
 从 [Releases](https://github.com/EasonWangs/network-monitor/releases) 页面下载：
 
-- **`NetworkMonitor.app`** - macOS 应用包（推荐，可双击运行）
-- **`NetworkMonitor-GUI-macOS`** - GUI 可执行文件（需要终端运行）
+- **`NetworkMonitor-macOS.dmg`** - macOS 磁盘镜像安装包（推荐）
+- **`NetworkMonitor.app`** - macOS 应用包（可单独下载）
+- **`NetworkMonitor-GUI-macOS`** - GUI 可执行文件
 - **`NetworkMonitor-CLI-macOS`** - 命令行可执行文件
 
-## 🚀 运行方式
+## 🚀 安装和运行
 
-### 方式1：使用 .app 应用包（推荐）
+### 方式1：使用 .dmg 安装包（推荐）
+
+1. **下载** `NetworkMonitor-macOS.dmg`
+2. **双击** 打开 .dmg 文件
+3. **拖拽** `NetworkMonitor.app` 到 `Applications` 文件夹
+4. **从启动台或应用程序文件夹** 启动 Network Monitor
+
+**优势**：
+- ✅ 标准 macOS 安装体验
+- ✅ 自动包含 CLI 版本
+- ✅ 包含安装说明
+- ✅ 符合 macOS 分发规范
+
+### 方式2：直接使用 .app 应用包
 
 1. **下载** `NetworkMonitor.app`
 2. **拖拽** 到应用程序文件夹（可选）
@@ -25,11 +39,16 @@
 - 打开 **系统偏好设置** → **安全性与隐私**
 - 点击 **"仍要打开"**
 
-### 方式2：使用终端运行
+### 方式3：使用终端运行
+
+如果从 .dmg 安装，CLI 版本已包含在内：
 
 ```bash
-# 下载后给文件执行权限
-chmod +x NetworkMonitor-GUI-macOS
+# 如果通过 .dmg 安装，CLI 版本位于应用包内
+/Applications/NetworkMonitor.app/Contents/Resources/NetworkMonitor-CLI-macOS
+
+# 或者下载独立的可执行文件
+chmod +x NetworkMonitor-GUI-macOS  # 通常不需要，文件已有权限
 chmod +x NetworkMonitor-CLI-macOS
 
 # 运行 GUI 版本
@@ -39,10 +58,13 @@ chmod +x NetworkMonitor-CLI-macOS
 ./NetworkMonitor-CLI-macOS
 ```
 
-### 方式3：绕过 Gatekeeper（高级用户）
+### 方式4：绕过 Gatekeeper（高级用户）
 
 ```bash
-# 移除隔离属性
+# 对于 .dmg 文件
+xattr -d com.apple.quarantine NetworkMonitor-macOS.dmg
+
+# 对于单独的可执行文件
 xattr -d com.apple.quarantine NetworkMonitor-GUI-macOS
 xattr -d com.apple.quarantine NetworkMonitor-CLI-macOS
 

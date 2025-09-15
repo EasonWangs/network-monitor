@@ -147,6 +147,50 @@ jobs:
         </plist>
         EOF
 
+    - name: Create DMG installer for macOS
+      run: |
+        # Create a temporary directory for DMG contents
+        mkdir -p dist/dmg-contents
+
+        # Copy app bundle to DMG contents
+        cp -r dist/NetworkMonitor.app dist/dmg-contents/
+
+        # Copy CLI executable to DMG contents
+        cp dist/NetworkMonitor-CLI-macOS dist/dmg-contents/
+
+        # Create README for DMG
+        cat > dist/dmg-contents/README.txt << 'EOF'
+        Network Monitor for macOS
+        =========================
+
+        Installation:
+        1. Drag NetworkMonitor.app to your Applications folder
+        2. For CLI usage, copy NetworkMonitor-CLI-macOS to /usr/local/bin/ (optional)
+
+        Usage:
+        - Double-click NetworkMonitor.app to run the GUI version
+        - Use Terminal to run NetworkMonitor-CLI-macOS for command-line version
+
+        Configuration:
+        - See CONFIGURATION.md in the GitHub repository for setup details
+        - Set DINGTALK_WEBHOOK environment variable for notifications
+
+        For more information, visit:
+        https://github.com/EasonWangs/network-monitor
+        EOF
+
+        # Create symbolic link to Applications folder
+        ln -s /Applications dist/dmg-contents/Applications
+
+        # Create DMG using hdiutil (available on macOS runners)
+        hdiutil create -volname "Network Monitor" \
+                       -srcfolder dist/dmg-contents \
+                       -ov -format UDZO \
+                       dist/NetworkMonitor-macOS.dmg
+
+        # Clean up temporary directory
+        rm -rf dist/dmg-contents
+
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -155,6 +199,7 @@ jobs:
           dist/NetworkMonitor-CLI-macOS
           dist/NetworkMonitor-GUI-macOS
           dist/NetworkMonitor.app
+          dist/NetworkMonitor-macOS.dmg
 
   release:
     needs: [build-linux, build-windows, build-macos]
@@ -186,6 +231,7 @@ jobs:
           **/NetworkMonitor-CLI-macOS
           **/NetworkMonitor-GUI-macOS
           **/NetworkMonitor.app
+          **/NetworkMonitor-macOS.dmg
         generate_release_notes: true
         draft: false
         prerelease: false
