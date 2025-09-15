@@ -126,7 +126,6 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-      releases: write
     steps:
     - uses: actions/checkout@v4
 
