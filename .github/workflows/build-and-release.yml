@@ -124,30 +124,33 @@ jobs:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      releases: write
     steps:
     - uses: actions/checkout@v4
 
     - name: Download all artifacts
       uses: actions/download-artifact@v4
-      with:
-        merge-multiple: true
 
     - name: List downloaded files
       run: |
         echo "Downloaded artifacts:"
-        find . -name "*NetworkMonitor*" -type f | sort
+        find . -type f -name "*NetworkMonitor*" | sort
+        echo "All files in current directory:"
+        ls -la
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          linux-builds/*
-          windows-builds/*
-          macos-builds/*
+          **/NetworkMonitor-CLI-Linux
+          **/NetworkMonitor-GUI-Linux
+          **/NetworkMonitor-CLI-Windows.exe
+          **/NetworkMonitor-GUI-Windows.exe
+          **/NetworkMonitor-CLI-macOS
+          **/NetworkMonitor-GUI-macOS
         generate_release_notes: true
         draft: false
         prerelease: false
         fail_on_unmatched_files: false
-        token: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
