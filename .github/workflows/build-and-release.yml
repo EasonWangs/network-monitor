@@ -1,0 +1,141 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Test DingTalk notification
+      run: |
+        python source/test_dingtalk.py || echo "DingTalk test may fail without webhook URL"
+
+  build-linux:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Linux executables
+      run: |
+        pyinstaller --onefile source/network_monitor.py --name NetworkMonitor-CLI-Linux
+        pyinstaller --onefile source/network_monitor_gui.py --name NetworkMonitor-GUI-Linux
+
+    - name: Upload Linux artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-builds
+        path: |
+          dist/NetworkMonitor-CLI-Linux
+          dist/NetworkMonitor-GUI-Linux
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Windows executables
+      run: |
+        pyinstaller --onefile source/network_monitor.py --name NetworkMonitor-CLI-Windows
+        pyinstaller --onefile --windowed source/network_monitor_gui.py --name NetworkMonitor-GUI-Windows
+
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-builds
+        path: |
+          dist/NetworkMonitor-CLI-Windows.exe
+          dist/NetworkMonitor-GUI-Windows.exe
+
+  build-macos:
+    needs: test
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build macOS executables
+      run: |
+        pyinstaller --onefile source/network_monitor.py --name NetworkMonitor-CLI-macOS
+        pyinstaller --onefile --windowed source/network_monitor_gui.py --name NetworkMonitor-GUI-macOS
+
+    - name: Upload macOS artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-builds
+        path: |
+          dist/NetworkMonitor-CLI-macOS
+          dist/NetworkMonitor-GUI-macOS
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          linux-builds/*
+          windows-builds/*
+          macos-builds/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

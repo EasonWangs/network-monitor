@@ -1,0 +1,36 @@
+{
+  "name": "network-monitor",
+  "version": "1.0.0",
+  "description": "A network monitoring tool with GUI and command-line interfaces",
+  "main": "source/network_monitor.py",
+  "scripts": {
+    "start": "python source/network_monitor.py",
+    "start-gui": "python source/network_monitor_gui.py",
+    "test-dingtalk": "python source/test_dingtalk.py",
+    "build": "python -m PyInstaller --onefile --windowed source/network_monitor_gui.py --name NetworkMonitor",
+    "build-cli": "python -m PyInstaller --onefile source/network_monitor.py --name NetworkMonitor-CLI",
+    "install": "pip install -r requirements.txt"
+  },
+  "keywords": [
+    "network",
+    "monitoring",
+    "ping",
+    "latency",
+    "gui",
+    "dingtalk",
+    "python"
+  ],
+  "author": "EasonWangs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EasonWangs/network-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EasonWangs/network-monitor/issues"
+  },
+  "homepage": "https://github.com/EasonWangs/network-monitor#readme",
+  "engines": {
+    "python": ">=3.8"
+  }
+}
