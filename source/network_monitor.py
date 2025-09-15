@@ -11,6 +11,7 @@ import argparse
 import json
 import platform
 import requests
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -22,7 +23,7 @@ class NetworkMonitor:
         self.last_notification_time = {}  # 记录上次通知时间，避免频繁发送
         
     def load_config(self, config_file: str) -> Dict:
-        """加载配置文件"""
+        """加载配置文件，支持环境变量覆盖敏感信息"""
         default_config = {
             "targets": ["8.8.8.8", "1.1.1.1", "114.114.114.114"],
             "latency_threshold": 100,  # 毫秒
@@ -34,7 +35,7 @@ class NetworkMonitor:
             "notification_interval": 300,  # 通知间隔(秒)，避免频繁发送
             "client_name": "默认客户端",  # 客户端名称，用于标识不同的监测实例
         }
-        
+
         config_path = Path(config_file)
         if config_path.exists():
             try:
@@ -44,11 +45,27 @@ class NetworkMonitor:
             except (json.JSONDecodeError, IOError) as e:
                 print(f"配置文件读取错误: {e}, 使用默认配置")
         else:
-            # 创建默认配置文件
+            # 创建安全的默认配置文件（不包含敏感信息）
+            safe_config = default_config.copy()
+            safe_config["dingtalk_webhook"] = "YOUR_DINGTALK_WEBHOOK_URL_HERE"
+            safe_config["client_name"] = "Network Monitor Client"
+
             with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(default_config, f, indent=2, ensure_ascii=False)
+                json.dump(safe_config, f, indent=2, ensure_ascii=False)
             print(f"已创建默认配置文件: {config_file}")
-        
+            print("请编辑配置文件设置 DingTalk webhook 地址")
+
+        # 支持环境变量覆盖敏感配置
+        env_webhook = os.getenv('DINGTALK_WEBHOOK')
+        if env_webhook:
+            default_config["dingtalk_webhook"] = env_webhook
+            default_config["dingtalk_enabled"] = True
+            print("使用环境变量中的 DingTalk webhook 配置")
+
+        env_client_name = os.getenv('CLIENT_NAME')
+        if env_client_name:
+            default_config["client_name"] = env_client_name
+
         return default_config
     
     def setup_logging(self):

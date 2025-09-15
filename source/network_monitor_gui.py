@@ -10,6 +10,7 @@ import threading
 import time
 import logging
 import requests
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, List
@@ -94,7 +95,7 @@ class NetworkMonitorGUI(QMainWindow):
         self.init_ui()
         
     def load_config(self):
-        """加载配置"""
+        """加载配置，支持环境变量覆盖敏感信息"""
         config_file = "config.json"
         default_config = {
             "targets": ["8.8.8.8", "1.1.1.1", "114.114.114.114"],
@@ -106,7 +107,7 @@ class NetworkMonitorGUI(QMainWindow):
             "notification_interval": 300,
             "client_name": "默认客户端"
         }
-        
+
         config_path = Path(config_file)
         if config_path.exists():
             try:
@@ -115,7 +116,25 @@ class NetworkMonitorGUI(QMainWindow):
                     default_config.update(user_config)
             except (json.JSONDecodeError, IOError):
                 pass
-                
+        else:
+            # 创建安全的默认配置文件（不包含敏感信息）
+            safe_config = default_config.copy()
+            safe_config["dingtalk_webhook"] = "YOUR_DINGTALK_WEBHOOK_URL_HERE"
+            safe_config["client_name"] = "Network Monitor Client"
+
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(safe_config, f, indent=2, ensure_ascii=False)
+
+        # 支持环境变量覆盖敏感配置
+        env_webhook = os.getenv('DINGTALK_WEBHOOK')
+        if env_webhook:
+            default_config["dingtalk_webhook"] = env_webhook
+            default_config["dingtalk_enabled"] = True
+
+        env_client_name = os.getenv('CLIENT_NAME')
+        if env_client_name:
+            default_config["client_name"] = env_client_name
+
         return default_config
     
     def setup_logging(self):

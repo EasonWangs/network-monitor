@@ -99,6 +99,11 @@ dist/
 
 # Local config with sensitive data
 config.local.json
+config.json
+
+# Any config files with credentials
+config.*.json
+!config.example.json
 
 # Temporary files
 *.tmp
